@@ -1,21 +1,20 @@
-# WatchDrop
-Full GitHub Pages front end for a UK watch-deal finder.
+# WatchDrop — live-feed upgrade
 
-## Features
-- Responsive deal dashboard
-- Search
-- Price, discount, style, movement and water-resistance filters
-- Brand filters generated from the data
-- Best-deal / price / discount / saving sorting
-- In-stock-only results
-- Watchlist stored in the visitor's browser
-- Deal statistics
-- GitHub Actions refresh framework
+This version keeps the WatchDrop interface and adds a more capable product-feed importer.
 
-## GitHub Pages
-Repository → Settings → Pages → Deploy from branch → `main` → `/ (root)`.
+## Important
 
-## Live data
-`data/watches.json` is deliberately separate from the interface. Connect authorised
-retailer or affiliate product feeds to the GitHub Action before using automated
-collection. Do not put private API keys in the website.
+The catalogue becomes live only after you obtain authorised product-feed access.
+
+A practical route is:
+1. Join relevant retailer affiliate programmes, such as suitable watch programmes on Awin.
+2. Create one or more watch product feeds in Awin.
+3. Copy the feed URLs.
+4. In GitHub, open **Settings → Secrets and variables → Actions**.
+5. Create a repository secret named `AWIN_FEEDS`.
+6. Put the feed URLs in one line, separated by commas.
+7. Run **Actions → Refresh WatchDrop catalogue → Run workflow**.
+
+The workflow then refreshes the catalogue every six hours.
+
+The importer is feed-first and does not scrape retailer websites. It filters for watch-related products, discounts, product links, and available items where stock data is supplied.
