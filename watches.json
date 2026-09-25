@@ -1,0 +1,28 @@
+[
+  {
+    "brand": "Casio",
+    "name": "A130WE-1AEF Vintage",
+    "price": 41.0,
+    "rrp": 59.0,
+    "discount_percent": 31,
+    "style": "Sport",
+    "movement": "Quartz",
+    "water_resistance": "50m",
+    "retailer": "Ernest Jones",
+    "url": "https://www.ernestjones.co.uk/",
+    "in_stock": true
+  },
+  {
+    "brand": "Bulova",
+    "name": "Marine Star Men's Black IP",
+    "price": 199.0,
+    "rrp": 429.0,
+    "discount_percent": 54,
+    "style": "Sport",
+    "movement": "Quartz",
+    "water_resistance": "100m",
+    "retailer": "Ernest Jones",
+    "url": "https://www.ernestjones.co.uk/",
+    "in_stock": true
+  }
+]

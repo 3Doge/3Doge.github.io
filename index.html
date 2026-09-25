@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WatchDrop — UK Watch Deals</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090c10;color:#f5f7fa;font:15px system-ui,-apple-system,Segoe UI,Arial}
+header{position:sticky;top:0;z-index:5;background:#0d1117ee;backdrop-filter:blur(14px);border-bottom:1px solid #27303a}
+.wrap{max-width:1250px;margin:auto;padding:22px}.hero{display:flex;justify-content:space-between;gap:20px;align-items:end}
+h1{font-size:34px;margin:0}.muted{color:#929daa}.controls{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:10px;margin-top:18px}
+input,select,button{background:#151b22;color:#fff;border:1px solid #303a45;border-radius:10px;padding:11px;font:inherit}button{cursor:pointer}
+main{padding-top:24px}.bar{display:flex;justify-content:space-between;color:#9aa4ae;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.card{background:#12171d;border:1px solid #29323b;border-radius:17px;overflow:hidden}.photo{height:185px;background:linear-gradient(135deg,#202a33,#0e1216);display:grid;place-items:center;position:relative}
+.watch{height:135px;width:135px;border-radius:50%;border:12px solid #56616b;background:radial-gradient(circle,#26303a 0 55%,#0d1115 56%);box-shadow:0 0 0 4px #101419}
+.watch:before,.watch:after{content:"";position:absolute;width:3px;height:53px;background:#fff;transform-origin:bottom center;left:50%;top:50%;border-radius:3px}.watch:before{transform:rotate(25deg) translate(-50%,-100%)}.watch:after{transform:rotate(290deg) translate(-50%,-100%)}
+.badge{position:absolute;top:12px;left:12px;background:#86efac;color:#06130a;padding:5px 8px;border-radius:999px;font-weight:800;font-size:12px}.stock{position:absolute;right:12px;top:12px;background:#07110b;color:#b7f7ca;padding:5px 8px;border-radius:999px;font-size:12px}
+.body{padding:16px}.brand{font-size:12px;color:#7dd3fc;font-weight:800;text-transform:uppercase}.name{font-size:18px;font-weight:750;margin:5px 0 10px}.tags{display:flex;gap:6px;flex-wrap:wrap}.tag{font-size:11px;background:#1d252d;border:1px solid #303a43;padding:4px 7px;border-radius:6px;color:#cbd5df}
+.price{display:flex;align-items:baseline;gap:8px;margin-top:14px}.now{font-size:25px;font-weight:850}.was{text-decoration:line-through;color:#66727d}.save{margin-left:auto;color:#86efac;font-weight:800}
+.shop{border-top:1px solid #28313a;margin-top:13px;padding-top:12px;display:flex;justify-content:space-between;align-items:center}.shop small{color:#8e99a5}.shop a{background:#f3f7fa;color:#0b0f13;text-decoration:none;padding:8px 10px;border-radius:8px;font-weight:750}
+.empty{text-align:center;padding:70px;color:#87919b;border:1px dashed #303943;border-radius:14px}
+@media(max-width:800px){.controls{grid-template-columns:1fr 1fr}.controls input{grid-column:1/-1}.hero{display:block}}
+</style></head>
+<body><header><div class="wrap"><div class="hero"><div><h1>⌚ WatchDrop</h1><div class="muted">UK watch deals • discounted • in stock</div></div><div class="muted" id="updated"></div></div>
+<div class="controls"><input id="q" placeholder="Search brand, model or style…"><select id="price"><option value="99999">Any price</option><option value="75">Under £75</option><option value="100">Under £100</option><option value="125">Under £125</option><option value="150">Under £150</option><option value="200">Under £200</option><option value="300">Under £300</option></select>
+<select id="discount"><option value="0">Any discount</option><option value="10">10%+</option><option value="20">20%+</option><option value="30">30%+</option><option value="40">40%+</option><option value="50">50%+</option></select>
+<select id="style"><option value="">Any style</option><option>Diver</option><option>Sport</option><option>Dress</option><option>Field</option><option>Chronograph</option></select>
+<select id="sort"><option value="deal">Best deals</option><option value="price">Lowest price</option><option value="discount">Biggest discount</option></select></div></div></header>
+<main class="wrap"><div class="bar"><span id="count"></span><span>Data refreshes automatically when GitHub Actions runs.</span></div><div id="grid" class="grid"></div></main>
+<script>
+let watches=[];
+const $=x=>document.getElementById(x);
+async function load(){try{watches=await fetch('data/watches.json',{cache:'no-store'}).then(r=>r.json())}catch(e){watches=[]}
+render()}
+function render(){let q=$('q').value.toLowerCase(), max=+$('price').value, min=+$('discount').value, st=$('style').value, sort=$('sort').value;
+let a=watches.filter(w=>w.in_stock&&w.discount_percent>=min&&w.price<=max&&(!st||w.style===st)&&(!q||(`${w.brand} ${w.name} ${w.style} ${w.movement}`).toLowerCase().includes(q)));
+a.sort((x,y)=>sort==='price'?x.price-y.price:sort==='discount'?y.discount_percent-x.discount_percent:(y.discount_percent*2+(y.rrp?Math.min(y.rrp-y.price,300)/10:0))-(x.discount_percent*2+(x.rrp?Math.min(x.rrp-x.price,300)/10:0)));
+$('count').textContent=`${a.length} deal${a.length===1?'':'s'} found`;
+$('grid').innerHTML=a.length?a.map(w=>`<article class="card"><div class="photo">${w.discount_percent?`<div class="badge">-${w.discount_percent}%</div>`:''}<div class="stock">● In stock</div><div class="watch"></div></div><div class="body"><div class="brand">${w.brand}</div><div class="name">${w.name}</div><div class="tags"><span class="tag">${w.style||'Watch'}</span><span class="tag">${w.movement||'—'}</span>${w.water_resistance?`<span class="tag">${w.water_resistance}</span>`:''}</div><div class="price"><span class="now">£${w.price.toFixed(2)}</span>${w.rrp?`<span class="was">£${w.rrp.toFixed(2)}</span><span class="save">SAVE £${(w.rrp-w.price).toFixed(2)}</span>`:''}</div><div class="shop"><small>${w.retailer}</small><a href="${w.url}" target="_blank" rel="noopener">View deal ↗</a></div></div></article>`).join(''):`<div class="empty">No matching deals. Try changing your filters.</div>`}
+['q','price','discount','style','sort'].forEach(id=>$(id).addEventListener('input',render));
+load();
+</script></body></html>
